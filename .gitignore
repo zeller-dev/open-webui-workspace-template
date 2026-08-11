@@ -1,16 +1,3 @@
-# Ignore persistent data and downloaded models, but preserve directory structure
-data/ollama/*
-!data/ollama/.gitkeep
-
-data/webui/*
-!data/webui/.gitkeep
-
-# Ignore sensitive environment variables
 .env
-
-# Node dependencies (if added in the future)
-node_modules/
-
-# OS generated files
-.DS_Store
-Thumbs.db
+*.log
+node_modules

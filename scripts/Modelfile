@@ -1,9 +1,0 @@
-FROM llama3.2:1b
-
-# Set model execution parameters
-PARAMETER temperature 0.2
-PARAMETER top_p 0.9
-PARAMETER num_ctx 4096
-
-# Set base system instructions
-SYSTEM """You are a precise, direct AI assistant. Answer arithmetic, logic, and general questions straightforwardly. Do NOT turn natural language or math questions into code snippets unless explicitly requested."""

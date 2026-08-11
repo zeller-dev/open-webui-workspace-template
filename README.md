@@ -1,91 +1,47 @@
-# Open WebUI Local Workspace
+# local-llm-stack
 
-A self-hosted, lightweight containerized setup for [Open WebUI](https://github.com/open-webui/open-webui) and [Ollama](https://ollama.com/), pre-configured for local privacy, RAG document search, and low-latency inference.
+Ollama + Open WebUI, containerized. Everything lives here — no host installs beyond
+Docker and the Nvidia driver/toolkit.
 
----
+## Prereqs (host only)
 
-## 📁 Repository Structure
+- Nvidia driver
+- nvidia-container-toolkit
+- Docker + Compose v2
+- Node/npm (just to run the scripts)
 
-```text
-open-webui/
-├── .env.example          # Template for environment variables
-├── .gitignore            # Ignores persistent data and local secrets
-├── docker-compose.yml    # Defines Open WebUI and Ollama services
-├── package.json          # Workspace lifecycle scripts
-├── scripts/
-│   ├── generate-key.js   # Standalone secret key generator
-│   └── setup.js          # Automates .env creation, docker startup & model pulls
-└── data/                 # Persistent storage (auto-generated, git-ignored)
-    ├── webui/            # SQLite database, uploads, and vector indices
-    └── ollama/           # Local LLM model weights
+## Setup
 
-```
+    cp .env.example .env    # adjust ports/model/timezone if needed
+    npm run up
 
----
+## Commands
 
-## 🚀 Quickstart
+    npm run up            # start
+    npm run down          # stop, keep model data
+    npm run reset         # stop and wipe all data (volumes)
+    npm run logs          # tail logs
+    npm run pull -- qwen3:14b   # pull a model (note the --)
+    npm run list           # list installed models
 
-Ensure **Docker Desktop** and **Node.js** are installed and running on your machine.
+## URLs
 
-### One-Command Setup
+- Ollama API: <http://localhost:${OLLAMA_PORT}> (default 11434)
+- Web UI: <http://localhost:${WEBUI_PORT}> (default 3000)
 
-Run the setup script:
+## Structure
 
-```bash
-npm run setup
+- `docker-compose.yml` — the two services + healthcheck, log rotation, GPU passthrough
+- `package.json` — npm script shortcuts around docker compose
+- `.env` — your local config (ports, default model, auth). Gitignored.
+- `.env.example` — template to copy from, safe to commit
+- `.gitignore` — keeps `.env`, `node_modules`, and logs out of version control
 
-```
+Model weights and chat history live in Docker named volumes (`ollama_data`,
+`open_webui_data`), not in this folder — `npm run reset` deletes them.
 
-This single command automatically:
+## Notes
 
-1. Copies `.env.example` to `.env` and injects a generated 32-byte `WEBUI_SECRET_KEY`.
-2. Boots up the Docker Compose stack in detached mode.
-3. Pulls the base models into Ollama:
-
-* **`nomic-embed-text`** (Required for RAG document processing)
-* **`llama3.2:1b`** (Lightweight ~1.3 GB base model for quick startup)
-
-Once complete, open your browser and go to:
-
-👉 **[http://localhost:3000](http://localhost:3000)**
-
----
-
-## 🛠️ Workspace Scripts
-
-| Command | Action |
-| --- | --- |
-| **`npm run setup`** | Runs full setup (`.env` generation + Docker boot + base model pull) |
-| **`npm run generate-key`** | Prints a fresh 32-byte hex secret key to terminal |
-| **`npm run up`** | Starts Docker Compose containers (`docker compose up -d`) |
-| **`npm run down`** | Stops Docker Compose containers (`docker compose down`) |
-| **`npm run logs`** | Streams live logs from all containers (`docker compose logs -f`) |
-
----
-
-## 📦 Pulling Additional Models
-
-To pull larger or specialized models (e.g., `qwen2.5-coder:7b`, `llama3.1`, `deepseek-r1:8b`), run `docker exec` directly:
-
-```bash
-docker exec -it ollama ollama pull <model-name>
-
-```
-
----
-
-## 🧹 Resetting the Database
-
-If you need to perform a clean reinstall and reset the WebUI state:
-
-```powershell
-# 1. Stop containers
-npm run down
-
-# 2. Clear WebUI database (keeps pulled model weights in data/ollama intact)
-npm run clean
-
-# 3. Restart stack
-npm run up
-
-```
+- Healthcheck on `ollama` means `open-webui` waits until Ollama is actually ready.
+- Log rotation (10MB x 3 files per service) keeps container logs from growing unbounded.
+- `WEBUI_AUTH=false` in `.env` disables the login screen if this stays on a trusted machine only.

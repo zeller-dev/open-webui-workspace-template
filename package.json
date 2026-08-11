@@ -1,14 +1,14 @@
 {
-  "name": "open-webui-workspace-template",
+  "name": "local-llm-stack",
   "version": "1.0.0",
-  "private": true,
-  "description": "Local Open WebUI and Ollama Docker workspace setup",
+  "private": false,
+  "description": "Ollama + Open WebUI, containerized",
   "scripts": {
-    "setup": "node ./scripts/setup.js",
-    "generate-key": "node ./scripts/generate-key.js",
-    "clean": "node ./scripts/clean.js",
     "up": "docker compose up -d",
     "down": "docker compose down",
-    "logs": "docker compose logs -f"
+    "reset": "docker compose down -v",
+    "logs": "docker compose logs -f",
+    "list": "docker exec -it ollama ollama list",
+    "pull": "docker exec -it ollama ollama pull"
   }
 }
