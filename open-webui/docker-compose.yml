@@ -1,33 +1,4 @@
 services:
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-    restart: unless-stopped
-    environment:
-      - TZ=${TZ:-UTC}
-    ports:
-      - "${OLLAMA_PORT:-11434}:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    healthcheck:
-      test: ["CMD-SHELL", "ollama list || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
     container_name: open-webui
@@ -40,20 +11,26 @@ services:
       - TASK_MODEL=${TASK_MODEL:-llama3.2:1b}
       - ENABLE_AUTOCOMPLETE_GENERATION=${ENABLE_AUTOCOMPLETE_GENERATION:-false}
       - ENABLE_FOLLOW_UP_GENERATION=${ENABLE_FOLLOW_UP_GENERATION:-false}
+      - ANONYMIZED_TELEMETRY=false
+      - DO_NOT_TRACK=true
+      - SCARF_NO_ANALYTICS=true
       - TZ=${TZ:-UTC}
     ports:
       - "${WEBUI_PORT:-3000}:8080"
     volumes:
       - open_webui_data:/app/backend/data
-    depends_on:
-      ollama:
-        condition: service_healthy
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
+    networks:
+      - ollama-net
 
 volumes:
-  ollama_data:
   open_webui_data:
+
+networks:
+  ollama-net:
+    external: true
+    name: ollama-net

@@ -1,0 +1,21 @@
+{
+  "name": "ollama-service",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Standalone Ollama service, shared across projects via the ollama-net Docker network",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "up": "docker compose up -d",
+    "down": "docker compose down",
+    "reset": "docker compose down -v",
+    "logs": "docker compose logs -f",
+    "list": "docker exec -it ollama ollama list",
+    "import": "docker exec -it ollama ollama create",
+    "auto-import": "node scripts/auto-import.js",
+    "search": "node scripts/search-model.js",
+    "list-files": "node scripts/list-files.js",
+    "fetch": "node scripts/fetch-model.js"
+  }
+}

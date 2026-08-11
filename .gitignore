@@ -1,3 +1,19 @@
+# Environment
 .env
+.env.*
+!.env.example
+
+# Logs
 *.log
+npm-debug.log*
+
+# Dependencies
 node_modules
+
+# Models — binaries and generated Modelfiles, not source
+ollama/models/*.gguf
+ollama/models/*.Modelfile
+
+# OS cruft
+.DS_Store
+Thumbs.db

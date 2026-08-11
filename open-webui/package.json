@@ -1,0 +1,16 @@
+{
+  "name": "open-webui-service",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Open WebUI, connects to the shared ollama-net Docker network",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.js",
+    "up": "npm run setup && docker compose up -d",
+    "down": "docker compose down",
+    "reset": "docker compose down -v",
+    "logs": "docker compose logs -f"
+  }
+}

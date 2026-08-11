@@ -1,17 +1,21 @@
 {
-  "name": "local-llm-stack",
+  "name": "llm-stack",
   "version": "1.0.0",
   "private": true,
-  "description": "Ollama + Open WebUI, containerized",
+  "description": "Ollama + Open WebUI as two independent projects sharing one Docker network",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "setup": "node scripts/setup.js",
-    "up": "npm run setup && docker compose up -d",
-    "down": "docker compose down",
-    "reset": "docker compose down -v",
-    "logs": "docker compose logs -f",
-    "list": "docker exec -it ollama ollama list",
-    "pull": "docker exec -it ollama ollama pull",
-    "pull-embed": "docker exec -it ollama ollama pull nomic-embed-text",
-    "pull-task": "docker exec -it ollama ollama pull llama3.2:1b"
+    "up": "npm --prefix ollama run up && npm --prefix open-webui run up",
+    "down": "npm --prefix open-webui run down && npm --prefix ollama run down",
+    "reset": "npm --prefix open-webui run reset && npm --prefix ollama run reset",
+    "logs:ollama": "npm --prefix ollama run logs",
+    "logs:webui": "npm --prefix open-webui run logs",
+    "list": "npm --prefix ollama run list",
+    "auto-import": "npm --prefix ollama run auto-import",
+    "search": "npm --prefix ollama run search --",
+    "list-files": "npm --prefix ollama run list-files --",
+    "fetch": "npm --prefix ollama run fetch --"
   }
 }
