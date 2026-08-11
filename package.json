@@ -1,0 +1,14 @@
+{
+  "name": "open-webui-workspace-template",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local Open WebUI and Ollama Docker workspace setup",
+  "scripts": {
+    "setup": "node ./scripts/setup.js",
+    "generate-key": "node ./scripts/generate-key.js",
+    "clean": "node ./scripts/clean.js",
+    "up": "docker compose up -d",
+    "down": "docker compose down",
+    "logs": "docker compose logs -f"
+  }
+}
