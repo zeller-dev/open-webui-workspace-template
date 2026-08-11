@@ -11,6 +11,7 @@
     "logs": "docker compose logs -f",
     "list": "docker exec -it ollama ollama list",
     "pull": "docker exec -it ollama ollama pull",
-    "pull-embed": "docker exec -it ollama ollama pull nomic-embed-text"
+    "pull-embed": "docker exec -it ollama ollama pull nomic-embed-text",
+    "pull-task": "docker exec -it ollama ollama pull llama3.2:1b"
   }
 }
