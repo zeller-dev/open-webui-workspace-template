@@ -27,7 +27,10 @@ let existing = new Set();
 try {
   const out = execFileSync('docker', ['exec', 'ollama', 'ollama', 'list'], { encoding: 'utf8' });
   out.split('\n').slice(1).forEach(line => {
-    const name = line.trim().split(/\s+/)[0];
+    // `ollama list` prints "name:tag" (e.g. "foo:latest"), but `ollama
+    // create` below is always called without an explicit tag — strip it so
+    // the comparison actually matches.
+    const name = line.trim().split(/\s+/)[0]?.replace(/:latest$/, '');
     if (name) existing.add(name);
   });
 } catch (e) {

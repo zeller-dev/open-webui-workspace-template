@@ -1,20 +1,45 @@
 #!/usr/bin/env node
-// List .gguf files available in a Hugging Face repo.
+// List .gguf files available in a Hugging Face repo. Restricted to trusted quantizers.
 // Usage: node scripts/list-files.js <repo>
 // Example: node scripts/list-files.js bartowski/Qwen3-14B-GGUF
 
+const TRUSTED_NAMESPACES = ['bartowski', 'unsloth'];
+
 const repo = process.argv[2];
-if (!repo) {
-  console.error('Usage: npm run list-files -- <repo>');
-  process.exit(1);
+const trustedPattern = new RegExp(`^(${TRUSTED_NAMESPACES.join('|')})/`);
+
+if (!repo || !repo.includes('/')) {
+  console.error('Usage: npm run list-files -- <owner/repo>');
+  console.error('Example: npm run list-files -- bartowski/Llama-3.2-1B-Instruct-GGUF');
+  process.exitCode = 1;
+} else if (!trustedPattern.test(repo)) {
+  console.error(`Refusing: "${repo}" isn't from a trusted quantizer.`);
+  console.error(`Only these namespaces are allowed: ${TRUSTED_NAMESPACES.join(', ')}`);
+  console.error('Run `npm run search -- "<model name>"` to find a trusted repo.');
+  process.exitCode = 1;
+} else {
+  main().catch(e => {
+    console.error(`Error: ${e.message}`);
+    process.exitCode = 1;
+  });
 }
 
 async function main() {
   const url = `https://huggingface.co/api/models/${repo}`;
-  const res = await fetch(url);
+
+  let res;
+  try {
+    res = await fetch(url);
+  } catch (e) {
+    console.error(`Network error: ${e.message}`);
+    process.exitCode = 1;
+    return;
+  }
+
   if (!res.ok) {
     console.error(`Failed to fetch repo info: ${res.status} ${res.statusText}`);
-    process.exit(1);
+    process.exitCode = 1;
+    return;
   }
   const data = await res.json();
   const ggufFiles = (data.siblings || [])
@@ -31,8 +56,3 @@ async function main() {
   console.log(`\nDownload one:`);
   console.log(`  npm run fetch -- ${repo} <filename>`);
 }
-
-main().catch(e => {
-  console.error('Error:', e.message);
-  process.exit(1);
-});

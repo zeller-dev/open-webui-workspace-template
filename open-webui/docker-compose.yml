@@ -11,6 +11,8 @@ services:
       - TASK_MODEL=${TASK_MODEL:-llama3.2:1b}
       - ENABLE_AUTOCOMPLETE_GENERATION=${ENABLE_AUTOCOMPLETE_GENERATION:-false}
       - ENABLE_FOLLOW_UP_GENERATION=${ENABLE_FOLLOW_UP_GENERATION:-false}
+      - RAG_EMBEDDING_ENGINE=${RAG_EMBEDDING_ENGINE:-ollama}
+      - RAG_EMBEDDING_MODEL=${RAG_EMBEDDING_MODEL:-embeddinggemma-300m-q8-0}
       - ANONYMIZED_TELEMETRY=false
       - DO_NOT_TRACK=true
       - SCARF_NO_ANALYTICS=true
@@ -26,6 +28,7 @@ services:
         max-file: "3"
     networks:
       - ollama-net
+      - webui-lan
 
 volumes:
   open_webui_data:
@@ -34,3 +37,10 @@ networks:
   ollama-net:
     external: true
     name: ollama-net
+  # Separate, non-internal network just so the published port above can
+  # actually bind to the host. ollama-net stays internal (no outbound
+  # internet from any container on it, including this one for reaching
+  # Ollama) — see ollama/README.md. Docker Desktop (Windows/Mac) silently
+  # refuses to publish ports for a container whose only network is
+  # internal, so open-webui needs this second leg to be reachable at all.
+  webui-lan:

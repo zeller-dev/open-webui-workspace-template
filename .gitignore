@@ -17,3 +17,5 @@ ollama/models/*.Modelfile
 # OS cruft
 .DS_Store
 Thumbs.db
+
+.claude
